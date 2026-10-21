@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="menu-release" content="v5-41-combined-dishes" />
+  <meta name="menu-release" content="v6-balanced-red-meat" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#526a42" />
   <meta name="description" content="今天吃什么？为妈妈准备的41道家常荤素合菜，搭配75克干燕麦米和其他主食；午晚食材避重，应季筛选、营养估算与备菜清单。" />
@@ -531,7 +531,7 @@ const S=(name,g)=>I(name,g,'优质蛋白',{role:'soy'});
 const T=(name,g)=>I(name,g,'调味');
 const seasonings=(soy=true)=>[T('菜籽油',3),T('食盐',.4),T('生姜',3),...(soy?[T('低钠酱油',4)]:[])];
 function R(id,name,category,seasons,ingredients,steps,time=20,tip='',extra={}){
- return {id,name,kind:'protein',category,proteinType:category,mainRecipe:true,composite:true,green:ingredients.some(i=>i.group==='绿叶菜'),seasons,ingredients:[...ingredients,...seasonings()],steps,time,tip,imageKey:id,introduced:4,defaultEligible:true,selectionWeight:category==='chicken'||category==='shrimp'?4:category==='fish'?2:category==='red'?.7:1,...extra};
+ return {id,name,kind:'protein',category,proteinType:category,mainRecipe:true,composite:true,green:ingredients.some(i=>i.group==='绿叶菜'),seasons,ingredients:[...ingredients,...seasonings()],steps,time,tip,imageKey:id,introduced:4,defaultEligible:true,selectionWeight:category==='chicken'||category==='shrimp'?4:category==='fish'?2:category==='red'?3:1,...extra};
 }
 const recipes=[
  R('c1','香菇小白菜滑鸡胸','chicken',ALL,[A('去皮鸡胸肉'),V('鲜香菇',40),L('小白菜',200),T('玉米淀粉',2)],['鸡胸逆纹切片，用淀粉和少量清水抓匀；香菇切片，小白菜洗净。','不粘锅放定量油，鸡片炒至熟透，加入香菇与一勺清水。','放小白菜翻炒至熟，加入所列酱油与盐，不另加油。'],18,'鸡胸净肉为可食部生重，避免额外裹粉。'),
@@ -593,8 +593,8 @@ recipes.push(
 const MAIN_RECIPES=recipes.filter(r=>r.mainRecipe);
 const VEGETABLE_OPTIONS=recipes.filter(r=>r.kind==='vegetable');
 const RECIPES=recipes;
-const POLICY_VERSION=5;
-const PROTEIN_POLICY_NOTE='一餐一道荤素合菜；午晚的肉类大类、蔬菜、豆制品和额外主食不重复，燕麦米和基础调味料除外。鱼类仅周二/周五且每日最多一餐，红肉仅周日且最多一餐，这是网页自设的保守频次。深海与淡水不等于汞高低；按具体鱼种和可追溯来源选购。';
+const POLICY_VERSION=6;
+const PROTEIN_POLICY_NOTE='一餐一道荤素合菜；午晚的肉类大类、蔬菜、豆制品和额外主食不重复，燕麦米和基础调味料除外。鱼类仅周二/周五且每日最多一餐，瘦红肉每天均可参与随机且最多一餐，整体以白肉为主；鱼类日期为网页自设的保守频次。深海与淡水不等于汞高低；按具体鱼种和可追溯来源选购。';
 const NUTRITION_NOTE='按常见食物成分近似估算，包含油面筋固有油脂、鸡翅皮、乳品、坚果及全部烹调油。包装主食、虾滑及肉片以实际标签为准。燕麦米按干重；鲜蔬果按生重可食部；馒头、面包、年糕按成品重。低胆固醇鸡蛋按2个蛋白66克估算。黄酒另计少量酒精能量，饮食需求请结合个人情况。';
 const SEASON_NOTE='按上海及中国温带常见上市季节筛选；鸡毛菜等可多季种植，当地供应与气候可能不同。';
 const fruits=[
@@ -614,7 +614,7 @@ const choose=(items,exclude=[])=>{if(!items.length)throw new Error('没有符合
 const localDateString=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
 function getSeason(date=localDateString()){const m=Number(String(date).slice(5,7));return m>=3&&m<=5?'spring':m>=6&&m<=8?'summer':m>=9&&m<=11?'autumn':'winter';}
 function getBreakfastType(date=localDateString()){const [y,m,d]=String(date).split('-').map(Number);return Math.floor(Date.UTC(y,m-1,d)/86400000)%2===0?'A':'B';}
-function getProteinPolicy(date=localDateString()){const [y,m,d]=String(date).split('-').map(Number),weekday=new Date(Date.UTC(y,m-1,d)).getUTCDay();return {version:5,weekday,fishAllowed:weekday===2||weekday===5,redMeatAllowed:weekday===0,fishMaxPerDay:1,redMeatMaxPerDay:1};}
+function getProteinPolicy(date=localDateString()){const [y,m,d]=String(date).split('-').map(Number),weekday=new Date(Date.UTC(y,m-1,d)).getUTCDay();return {version:6,weekday,fishAllowed:weekday===2||weekday===5,redMeatAllowed:true,fishMaxPerDay:1,redMeatMaxPerDay:1};}
 function getEligibleProteinRecipes(date,season,otherProtein=null){const p=getProteinPolicy(date);return MAIN_RECIPES.filter(r=>r.seasons.includes(season)&&(!otherProtein||r.proteinType!==otherProtein.proteinType)&&(r.proteinType!=='fish'||p.fishAllowed)&&(r.proteinType!=='red'||p.redMeatAllowed));}
 const animalNames=new Map(MAIN_RECIPES.map(r=>[r.ingredients.find(i=>i.role==='animal').name,r.category]));
 const normalize=name=>animalNames.has(name)?`动物:${animalNames.get(name)}`:['彩椒','青椒'].includes(name)?'甜椒':['小白菜','鸡毛菜'].includes(name)?'小白菜':['北豆腐','香干','鲜毛豆仁'].includes(name)?'大豆及豆制品':['原味馒头','低糖低油全麦面包','油面筋'].includes(name)?'小麦主食及面筋':name;
@@ -656,7 +656,7 @@ function recalcPlan(plan){
  for(const slot of MEALS){const meal=plan[slot];meal.items=itemsOf(meal);for(const item of meal.items){item.totals=rounded(sumIngredients(item.ingredients));if(item.kind==='protein'||item.kind==='vegetable'){item.serving=item.ingredients.filter(i=>i.group!=='调味').map(i=>`${i.name}${i.g}克`).join('、');item.animalGrams=round(item.ingredients.filter(i=>i.role==='animal').reduce((s,i)=>s+i.g,0));item.vegetableGrams=round(item.ingredients.filter(i=>i.group==='蔬菜'||i.group==='绿叶菜').reduce((s,i)=>s+i.g,0));item.leafyGrams=round(item.ingredients.filter(i=>i.group==='绿叶菜').reduce((s,i)=>s+i.g,0));}if(item.kind==='staple'||item===plan.breakfast.staple)item.serving=item.ingredients.map(i=>`${i.name}${i.g}克${i.basis?`（${i.basis}）`:''}`).join('＋');}meal.totals=rounded(sumIngredients(meal.items.flatMap(i=>i.ingredients)));meal.oats=round(meal.items.flatMap(i=>i.ingredients).filter(i=>i.name==='燕麦米').reduce((s,i)=>s+i.g,0));meal.oil=round(meal.items.flatMap(i=>i.ingredients).filter(i=>i.name==='菜籽油').reduce((s,i)=>s+i.g,0));}
  const ingredients=allIngredients(plan);plan.totals=rounded(sumIngredients(ingredients));plan.oatsTotal=round(ingredients.filter(i=>i.name==='燕麦米').reduce((s,i)=>s+i.g,0));plan.oilTotal=round(ingredients.filter(i=>i.name==='菜籽油').reduce((s,i)=>s+i.g,0));plan.leafyTotal=round(ingredients.filter(i=>i.group==='绿叶菜').reduce((s,i)=>s+i.g,0));plan.targets={protein:70,carbs:150,fatMax:40,oats:75};plan.policy=policyValid(plan);plan.ingredientConflicts=getIngredientConflicts(plan);plan.noIngredientOverlap=!plan.ingredientConflicts.length;plan.withinTargets=plan.policy.valid&&portionsValid(plan)&&plan.noIngredientOverlap&&plan.oatsTotal===75&&plan.leafyTotal>=200&&plan.totals.protein>=65&&plan.totals.protein<=80&&plan.totals.carbs>=140&&plan.totals.carbs<=160&&plan.totals.fat<=40;return plan;
 }
-function isPlanCurrent(plan){if(!plan||plan.version!==5||!/^\d{4}-\d{2}-\d{2}$/.test(plan.date)||!ALL.includes(plan.season))return false;try{return recalcPlan(clone(plan)).withinTargets;}catch{return false;}}
+function isPlanCurrent(plan){if(!plan||plan.version!==6||!/^\d{4}-\d{2}-\d{2}$/.test(plan.date)||!ALL.includes(plan.season))return false;try{return recalcPlan(clone(plan)).withinTargets;}catch{return false;}}
 function balancePlan(plan,{keepStaples=false,avoidStaple=null}={}){
  const animals=[meatIngredient(plan.lunch.protein),meatIngredient(plan.dinner.protein)];
  const extras=STAPLE_OPTIONS.filter(s=>s.seasons.includes(plan.season));
@@ -694,7 +694,7 @@ function tryPlans({date,season,breakfastType,previous=null,fixedBreakfast=null,f
   const breakfast=fixedBreakfast?clone(fixedBreakfast):makeBreakfast(breakfastType,season,previous?.breakfast);
   const snackFruit=fixedSnack?clone(fixedSnack):fruitItem(choose(fruits.filter(f=>f.seasons.includes(season)),[breakfast.fruit.id,previous?.snack?.fruit?.id]),150);
   for(const pair of pairs){
-   const plan={version:5,date,season,breakfastType,breakfast:clone(breakfast),lunch:makeMeal('lunch',clone(pair.a),makeStaple(breakfastType==='A'?25:50)),dinner:makeMeal('dinner',clone(pair.b),makeStaple(25)),snack:{id:'snack',title:'下午加餐',time:'15:30',fruit:clone(snackFruit),items:[clone(snackFruit)],tip:'吃完整鲜果，不加糖。'}};
+   const plan={version:6,date,season,breakfastType,breakfast:clone(breakfast),lunch:makeMeal('lunch',clone(pair.a),makeStaple(breakfastType==='A'?25:50)),dinner:makeMeal('dinner',clone(pair.b),makeStaple(25)),snack:{id:'snack',title:'下午加餐',time:'15:30',fruit:clone(snackFruit),items:[clone(snackFruit)],tip:'吃完整鲜果，不加糖。'}};
    try{return balancePlan(plan,{avoidStaple});}catch{}
   }
   if(fixedBreakfast&&fixedSnack)break;
@@ -1126,7 +1126,7 @@ const seasonCopy = {spring:'春鲜正当时',summer:'清爽好食光',autumn:'�
 const rememberedDate = read('chifan-selected-date', null);
 let selectedDate = rememberedDate?.day === today && /^\d{4}-\d{2}-\d{2}$/.test(rememberedDate.date) ? rememberedDate.date : today;
 let seasonOverride = read('chifan-season',null);
-let plans = read('chifan-plans-v5',{});
+let plans = read('chifan-plans-v6',{});
 let favorites = read('chifan-favorites',[]);
 let checked = read('chifan-shopping-checks',{});
 let currentView = 'today';
@@ -1137,7 +1137,7 @@ const main = document.querySelector('#main-content');
 const dialog = document.querySelector('#detail-dialog');
 function season(){return seasonOverride || getSeason(selectedDate);}
 function loadPlan(){const candidate=plans[`${selectedDate}-${season()}`];let valid=false;try{valid=!!candidate?.breakfast&&candidate.date===selectedDate&&candidate.season===season()&&isPlanCurrent(candidate);}catch{}plan=valid?candidate:createPlan({date:selectedDate,season:season()});persist();}
-function persist(){plans[`${selectedDate}-${season()}`]=plan;save('chifan-plans-v5',plans);save('chifan-selected-date',{day:today,date:selectedDate});}
+function persist(){plans[`${selectedDate}-${season()}`]=plan;save('chifan-plans-v6',plans);save('chifan-selected-date',{day:today,date:selectedDate});}
 function toast(message){const el=document.querySelector('#toast');el.textContent=message;el.classList.add('visible');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('visible'),2800);}
 const round = n => Number(n || 0).toFixed(1);
 const photoPositions = {cod:[0,0],pork:[1,0],shrimp:[2,0],chicken:[0,1],beef:[1,1],fish:[2,1],breakfastA:[0,2],breakfastB:[1,2],fruit:[2,2]};
@@ -1151,7 +1151,7 @@ function updateChrome(){
  document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.dataset.view===currentView));
  document.querySelector('#breadcrumb').textContent={today:'今日菜单',shopping:'备菜清单',catalog:'菜谱库',favorites:'我的收藏',guide:'饮食小贴士'}[currentView];
 }
-function render(){main.dataset.menuVersion='5';updateChrome();({today:renderToday,shopping:renderShopping,catalog:renderCatalog,favorites:renderFavorites,guide:renderGuide}[currentView]||renderToday)();}
+function render(){main.dataset.menuVersion='6';updateChrome();({today:renderToday,shopping:renderShopping,catalog:renderCatalog,favorites:renderFavorites,guide:renderGuide}[currentView]||renderToday)();}
 function heading(title,subtitle,actions='',eyebrow='DAILY TABLE · 日常好食'){return '<div class="page-heading"><div><div class="eyebrow">'+eyebrow+'</div><h1>'+title+'</h1><p>'+subtitle+'</p></div><div class="heading-actions">'+actions+'</div></div>';}
 function renderDates(){
  const d=dateObject(today);let html='';
@@ -1192,7 +1192,7 @@ function componentList(r){const animals=new Set(animalIngredients(r));return (r.
 function stapleText(staple){return (staple?.ingredients||[]).filter(i=>i.g>0).map(i=>escape(i.name)+' <strong>'+amountText(i)+'</strong><small>'+escape(weightBasis(i))+'</small>').join('<span class="staple-plus">＋</span>');}
 function mealCard(slot){
  const m=plan[slot],p=m.protein;const leafy=leafyGrams(p);
- return '<article class="meal-card combined-meal" data-menu-version="5" data-meal-slot="'+slot+'"><div class="meal-photo">'+photo(p.imageKey,'',p.name)+'<div class="photo-top"><span class="meal-label">'+icon(slot==='lunch'?'sun':'bowl')+(slot==='lunch'?'午餐':'晚餐')+'</span><span class="meal-time">'+(slot==='lunch'?'12:00 — 13:00':'18:00 — 19:00')+'</span></div>'+favoriteButton(p)+'<button class="photo-detail" data-detail="'+slot+'" aria-label="查看'+escape(p.name)+'做法"></button></div><div class="meal-content"><div class="meal-pair-status">'+icon('check')+'一道荤素合菜，搭配主食</div><section class="combined-dish" aria-label="荤素合菜"><span class="dish-kind">'+recipeCategory(p)+(leafy?' <small>· 含绿叶菜</small>':'')+'</span><h3><button class="title-button" data-detail="'+slot+'">'+escape(p.name)+'</button></h3><p class="dish-portion">'+animalPortion(p)+'</p><p class="combined-ingredients">配菜：'+componentList(p)+'</p><div class="tag-row">'+spiceTag(p)+'<span class="tag green">'+icon('leaf')+' 蔬菜 '+grams(vegetableGrams(p))+'g</span>'+(leafy?'<span class="tag neutral">绿叶菜 '+grams(leafy)+'g</span>':'')+'<span class="tag neutral">'+icon('clock')+' '+(p.time||20)+' 分钟</span></div></section><section class="meal-staple staple-combination" aria-label="主食组合"><div class="staple-label">'+icon('rice')+'<span>今天的主食</span></div><div class="staple-portions">'+stapleText(m.staple)+'</div></section><div class="meal-change-actions"><button class="dish-swap" data-swap="'+slot+'">'+icon('refresh')+'换合菜</button><button class="dish-swap quiet" data-swap-dish="'+slot+'" data-dish-type="vegetable">'+icon('leaf')+'换配菜</button><button class="dish-swap quiet" data-swap-dish="'+slot+'" data-dish-type="staple" '+(m.oats===50?'disabled title="本餐已安排50g干燕麦米"':'')+'>'+icon('rice')+'换主食</button></div><div class="meal-card-footer"><span class="macro-inline">'+Math.round(m.totals.kcal)+' kcal <i>·</i> 蛋白质 '+round(m.totals.protein)+' g</span><button class="recipe-link" data-detail="'+slot+'">整餐做法 '+icon('arrow')+'</button></div></div></article>';
+ return '<article class="meal-card combined-meal" data-menu-version="6" data-meal-slot="'+slot+'"><div class="meal-photo">'+photo(p.imageKey,'',p.name)+'<div class="photo-top"><span class="meal-label">'+icon(slot==='lunch'?'sun':'bowl')+(slot==='lunch'?'午餐':'晚餐')+'</span><span class="meal-time">'+(slot==='lunch'?'12:00 — 13:00':'18:00 — 19:00')+'</span></div>'+favoriteButton(p)+'<button class="photo-detail" data-detail="'+slot+'" aria-label="查看'+escape(p.name)+'做法"></button></div><div class="meal-content"><div class="meal-pair-status">'+icon('check')+'一道荤素合菜，搭配主食</div><section class="combined-dish" aria-label="荤素合菜"><span class="dish-kind">'+recipeCategory(p)+(leafy?' <small>· 含绿叶菜</small>':'')+'</span><h3><button class="title-button" data-detail="'+slot+'">'+escape(p.name)+'</button></h3><p class="dish-portion">'+animalPortion(p)+'</p><p class="combined-ingredients">配菜：'+componentList(p)+'</p><div class="tag-row">'+spiceTag(p)+'<span class="tag green">'+icon('leaf')+' 蔬菜 '+grams(vegetableGrams(p))+'g</span>'+(leafy?'<span class="tag neutral">绿叶菜 '+grams(leafy)+'g</span>':'')+'<span class="tag neutral">'+icon('clock')+' '+(p.time||20)+' 分钟</span></div></section><section class="meal-staple staple-combination" aria-label="主食组合"><div class="staple-label">'+icon('rice')+'<span>今天的主食</span></div><div class="staple-portions">'+stapleText(m.staple)+'</div></section><div class="meal-change-actions"><button class="dish-swap" data-swap="'+slot+'">'+icon('refresh')+'换合菜</button><button class="dish-swap quiet" data-swap-dish="'+slot+'" data-dish-type="vegetable">'+icon('leaf')+'换配菜</button><button class="dish-swap quiet" data-swap-dish="'+slot+'" data-dish-type="staple" '+(m.oats===50?'disabled title="本餐已安排50g干燕麦米"':'')+'>'+icon('rice')+'换主食</button></div><div class="meal-card-footer"><span class="macro-inline">'+Math.round(m.totals.kcal)+' kcal <i>·</i> 蛋白质 '+round(m.totals.protein)+' g</span><button class="recipe-link" data-detail="'+slot+'">整餐做法 '+icon('arrow')+'</button></div></div></article>';
 }
 function compactCard(slot){
  const m=plan[slot],breakfast=slot==='breakfast',names=(m.items||[]).map(i=>i.name||i.title).filter(Boolean);
@@ -1203,7 +1203,7 @@ function dailyPolicyCopy(){const p=getProteinPolicy(selectedDate);return (p.fish
 function conflictList(){return plan.ingredientConflicts??getIngredientConflicts(plan.lunch,plan.dinner);}
 function renderRecipeUpdate(){
  const conflicts=conflictList();const clear=Array.isArray(conflicts)&&conflicts.length===0&&plan.noIngredientOverlap!==false;
- return '<section class="recipe-update" data-menu-version="5" aria-label="家常合菜与食材检查"><div class="recipe-update-title">'+icon('bowl')+'<strong>'+mainRecipes().length+'道家常荤素合菜 · 白肉优先</strong><span>'+categoryCount('chicken')+'鸡 · '+categoryCount('shrimp')+'虾 · '+categoryCount('fish')+'鱼 · '+categoryCount('red')+'红肉 · 3其他</span><button class="recipe-link" data-view="catalog">浏览菜谱库 '+icon('arrow')+'</button></div><p class="recipe-new-note">新增'+recentRecipes().length+'道家常菜，含咖喱、鱼香和微辣口味；辣椒可按喜好减量。</p><div class="ingredient-status '+(clear?'passed':'attention')+'" data-ingredient-check="'+(clear?'passed':'attention')+'">'+icon(clear?'check':'info')+'<strong>'+(clear?'午晚餐主料、蔬菜、豆制品和额外主食不重复':'请查看本次食材检查')+'</strong></div><p>'+dailyPolicyCopy()+'<button class="inline-guide" data-view="guide">查看搭配规则</button></p></section>';
+ return '<section class="recipe-update" data-menu-version="6" aria-label="家常合菜与食材检查"><div class="recipe-update-title">'+icon('bowl')+'<strong>'+mainRecipes().length+'道家常荤素合菜 · 白肉优先</strong><span>'+categoryCount('chicken')+'鸡 · '+categoryCount('shrimp')+'虾 · '+categoryCount('fish')+'鱼 · '+categoryCount('red')+'红肉 · 3其他</span><button class="recipe-link" data-view="catalog">浏览菜谱库 '+icon('arrow')+'</button></div><p class="recipe-new-note">新增'+recentRecipes().length+'道家常菜，含咖喱、鱼香和微辣口味；辣椒可按喜好减量。</p><div class="ingredient-status '+(clear?'passed':'attention')+'" data-ingredient-check="'+(clear?'passed':'attention')+'">'+icon(clear?'check':'info')+'<strong>'+(clear?'午晚餐主料、蔬菜、豆制品和额外主食不重复':'请查看本次食材检查')+'</strong></div><p>'+dailyPolicyCopy()+'<button class="inline-guide" data-view="guide">查看搭配规则</button></p></section>';
 }
 function renderToday(){
  main.innerHTML=heading('今天吃什么？','一道家常荤素合菜，再配一份扎实的主食。','<button class="btn secondary" data-view="shopping">'+icon('basket')+'备菜清单</button><button class="btn primary" id="random-all">'+icon('shuffle')+'换个搭配</button>')+renderDates()+renderRecipeUpdate()+renderNutrients()+'<div class="section-heading"><div><h2>一日三餐，好好吃饭<span class="small-leaf">'+icon('sprout')+'</span></h2><p>'+dateLabel(selectedDate)+' <span>·</span> '+seasonCopy[season()]+'</p></div><span class="section-note">'+icon('leaf')+' 肉和蔬菜，同在一道菜里</span></div><section class="meal-grid" aria-label="午餐与晚餐">'+mealCard('lunch')+mealCard('dinner')+'</section><section class="secondary-meals" aria-label="早餐与下午加餐">'+compactCard('breakfast')+compactCard('snack')+'</section><div class="gentle-note"><span class="note-symbol">'+icon('grain')+'</span><div><strong>每天75g干燕麦米，25g的午晚餐再配50g其他主食</strong><p>'+(plan.breakfastType==='A'?'今天早餐25g、午餐25g、晚餐25g燕麦米；午晚餐各配50g其他主食。':'今天午餐50g、晚餐25g燕麦米；早餐吃其他主食，晚餐另配50g其他主食。')+'</p></div><span class="note-check">'+icon('check')+' 已安排</span></div><p class="page-note">'+icon('info')+' 燕麦米按干重；玉米、紫薯按可食部生重；馒头、面包和年糕按成品重。燕麦米和基础调味料允许午晚共用。营养为估算，含烹调油、坚果和食材本身的脂肪；今日用油 '+grams(plan.oilTotal)+'g。</p>';
@@ -1222,7 +1222,7 @@ function renderCatalog(){
  const filtered=all.filter(r=>(catalogSeason==='all'||r.seasons.includes(catalogSeason==='current'?season():catalogSeason))&&(catalogKind==='all'||catalogKind==='main'&&recipeType(r)!=='vegetable'||catalogKind==='new'&&isRecentRecipe(r)||catalogKind==='other'&&['bullfrog','crab','shellfish'].includes(recipeType(r))||recipeType(r)===catalogKind));
  const veg=catalogKind==='vegetable';
  const filters=[['main','全部荤素合菜',mainRecipes().length],['new','本次新增',recentRecipes().length],['chicken','鸡肉',categoryCount('chicken')],['shrimp','虾类',categoryCount('shrimp')],['fish','鱼类',categoryCount('fish')],['red','瘦红肉',categoryCount('red')],['other','牛蛙、蟹、贝',3],['vegetable','沪式蔬菜替换',categoryCount('vegetable')],['all','全部菜谱与替换项',all.length]];
- main.innerHTML=heading('熟悉的家常味，换着做。','共'+mainRecipes().length+'道荤素合菜，本次新增'+recentRecipes().length+'道，另有'+categoryCount('vegetable')+'道沪式蔬菜替换项；今日实际份量以菜单与备菜清单为准。','','HOME KITCHEN · 妈妈的菜谱库')+'<div class="catalog-toolbar"><label>菜品类型<select id="catalog-kind">'+filters.map(([key,label,count])=>'<option value="'+key+'">'+label+' · '+count+'道</option>').join('')+'</select></label><label>食材季节<select id="catalog-season"><option value="all">全部季节</option><option value="current">当前'+seasonNames[season()]+'食单</option>'+Object.entries(seasonNames).map(([key,name])=>'<option value="'+key+'">'+name+'食材</option>').join('')+'</select></label><span>找到 '+filtered.length+' 道</span></div><p class="catalog-note">'+(veg?'这些菜用于替换合菜里的蔬菜部分，换配菜时会重新计算营养与午晚食材重复。':'每餐一道荤素合菜，配上标明份量的主食。菜库中的鱼与红肉按日期限制随机出现，其他食材也会按季节筛选。微辣菜可减少辣椒，咖喱使用定量咖喱粉。')+icon('info')+'</p>'+(filtered.length?'<div class="favorites-grid catalog-grid">'+filtered.map(recipeCard).join('')+'</div>':'<div class="empty-state"><h2>这个筛选暂时没有菜谱</h2><p>试试其他类型或季节。</p></div>');
+ main.innerHTML=heading('熟悉的家常味，换着做。','共'+mainRecipes().length+'道荤素合菜，本次新增'+recentRecipes().length+'道，另有'+categoryCount('vegetable')+'道沪式蔬菜替换项；今日实际份量以菜单与备菜清单为准。','','HOME KITCHEN · 妈妈的菜谱库')+'<div class="catalog-toolbar"><label>菜品类型<select id="catalog-kind">'+filters.map(([key,label,count])=>'<option value="'+key+'">'+label+' · '+count+'道</option>').join('')+'</select></label><label>食材季节<select id="catalog-season"><option value="all">全部季节</option><option value="current">当前'+seasonNames[season()]+'食单</option>'+Object.entries(seasonNames).map(([key,name])=>'<option value="'+key+'">'+name+'食材</option>').join('')+'</select></label><span>找到 '+filtered.length+' 道</span></div><p class="catalog-note">'+(veg?'这些菜用于替换合菜里的蔬菜部分，换配菜时会重新计算营养与午晚食材重复。':'每餐一道荤素合菜，配上标明份量的主食。鱼类按日期限频，瘦红肉每天可随机出现且最多一餐；其他食材也会按季节筛选。微辣菜可减少辣椒，咖喱使用定量咖喱粉。')+icon('info')+'</p>'+(filtered.length?'<div class="favorites-grid catalog-grid">'+filtered.map(recipeCard).join('')+'</div>':'<div class="empty-state"><h2>这个筛选暂时没有菜谱</h2><p>试试其他类型或季节。</p></div>');
  document.querySelector('#catalog-kind').value=catalogKind;document.querySelector('#catalog-season').value=catalogSeason;
 }
 function renderFavorites(){
@@ -1236,7 +1236,7 @@ function renderGuide(){
  ['午晚食材不重复','按实际食材检查主料、蔬菜、豆制品与额外主食。鸡胸、鸡腿、鸡翅都按鸡肉判重，各种虾和虾滑都按虾类判重；鱼类和红肉也各归为同一大类。燕麦米及油、盐、葱姜蒜等基础调味料允许共用。','check'],
  ['少油的沪式家常味','带鱼不预炸，红烧鳝丝不浇响油，罗宋汤用鲜番茄、不加黄油。油面筋本身的油脂、鸡翅的皮、羊肉的肥瘦和虾滑的配料均计入营养估算，全天脂肪目标不超过40g。','drop'],
  ['鱼种与来源，比深海标签更有用','鳕鱼选标注清楚的真鳕或狭鳕，金枪鱼菜使用明确标注的鲣鱼，不安排大眼金枪鱼。汞风险还与鱼种、体型、食物链和来源有关，淡水鱼也需要关注来源。网页不能检测或保证食材汞含量达标。','bowl'],
- ['鱼类限频，红肉少量','网页自设保守规则：周二和周五可安排鱼类，每日最多一餐；周日可安排瘦红肉，最多一餐。其余以鸡肉、虾仁等搭配。换菜遵守相同规则；这套日期设置不是通用医疗建议。','protein'],
+ ['鱼类限频，红肉轮换','瘦红肉每天均可参与随机，午晚最多一餐；整体仍以鸡肉、虾仁等白肉为主。鱼类按网页自设规则在周二和周五可出现，每日最多一餐。换菜也遵守营养、季节和食材避重要求。','protein'],
  ['称量方式与早餐鸡蛋','燕麦米按干重，玉米和紫薯按可食部生重，馒头、面包和年糕按成品重。肉、鱼、虾、蟹、贝按可食净重；汤菜里的肉也按实际吃到的份量计算。“低胆固醇鸡蛋”默认按2个蛋白、约66g估算。','sun'],
  ['营养数字，配合实际需要看','全天目标为碳水约150g、蛋白质约70g、脂肪不超过40g，包含乳品、坚果和全部烹调油。页面同时显示实际总热量；这套目标的能量有限，需结合妈妈的体型、活动量和个人需要判断。营养成分与图片均为参考。','info']
  ];
